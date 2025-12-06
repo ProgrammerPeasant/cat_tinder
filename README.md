@@ -7,7 +7,9 @@
 - [Cat Tinder v1.0.0 (release)](artifacts/cat_tinder-v1.0.0.apk)
 
 ## Фичи
-
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
 - Случайная анкета кота с фото, названием и страной происхождения породы
 - Управление свайпом или кнопками, счётчик лайков обновляется мгновенно
 - Предзагрузка 4 следующих анкет, чтобы не было пауз между свайпами.
@@ -26,7 +28,7 @@
 ## Как запустить
 
 ```bash
-git clone <repo>
+git clone https://github.com/ProgrammerPeasant/cat_tinder
 cd cat_tinder
 flutter pub get
 flutter run
