@@ -4,21 +4,20 @@
 - **TheCatAPI** (`https://api.thecatapi.com/v1`)
   - `/images/search` – получение случайного изображения кота вместе с данными о породе.
   - `/breeds` – каталог пород, используем для таба «Список пород» и для детальных описаний.
-- В проекте будет использоваться `dio` c перехватчиком ошибок и логированием. Ключ API читается из `.env` (через `flutter_dotenv`), при отсутствии – запросы выполняются без заголовка.
 
 ## Слой данных
-- `CatImage` – id, url, width, height, `breed` (опциональный `CatBreed`).
-- `CatBreed` – id, name, origin, description, temperament, life span, intelligence, adaptability и т.д.
-- `CatApiClient` – отвечает за низкоуровневые HTTP-запросы (`dio`). Методы:
+- `CatImage` – id, url, width, height, `breed` (опциональный `CatBreed`)
+- `CatBreed` – id, name, origin, description, temperament, life span, intelligence, adaptability и т д
+- `CatApiClient` – отвечает за низкоуровневые HTTP-запросы. Методы:
   - `Future<List<CatImage>> fetchRandomCats({int limit = 1})`
   - `Future<List<CatBreed>> fetchBreeds()`
 - `CatRepository` – бизнес-логика:
-  - `Future<CatImage> getRandomCat()` – достаёт одного кота (берёт первый из `/images/search`).
-  - `Future<List<CatBreed>> getBreeds()` – кэширует результат в памяти, повторно использует список.
+  - `Future<CatImage> getRandomCat()`
+  - `Future<List<CatBreed>> getBreeds()`
 
 ## Состояние и менеджмент
 - Используется `ChangeNotifier` + `Provider`.
-- `SwipeDeckController` – хранит текущего кота, счетчик лайков, обрабатывает свайпы и кнопки.
+- `SwipeDeckController` - хранит текущего кота, счетчик лайков, обрабатывает свайпы и кнопки.
 - `BreedsController` – хранит список пород и состояние загрузки/ошибок.
 - Общая модель “UI state”: `enum LoadState { idle, loading, error }`.
 - Ошибки обрабатываются централизованным `ErrorHandler`, который возвращает человекочитаемое сообщение и триггерит показ диалога (`showErrorDialog`).
@@ -33,21 +32,6 @@
   - `BreedDetailsPage` – по тапу на элемент списка пород.
 
 ## UI-компоненты
-- `CatCard` – карточка с изображением (`CachedNetworkImage`), названием породы и overlay-индикаторами свайпа.
-- `SwipeActions` – две круглые кнопки (лайк/дизлайк) с тенями и вибрацией (через `HapticFeedback.selectionClick`).
-- `BreedsListTile` – ячейка списка пород с миниатюрой и базовыми фактами.
-- Общие декоративные элементы: градиентный фон, стеклянные панели (`Glassmorphism`) для придания «приложение с душой».
-
-## Обработка ошибок и офлайн
-- При сетевых сбоях пользуемся `try/catch` и отображаем модальное окно с кнопкой «Повторить».
-- Для пород используется кэш в памяти, поэтому при повторном входе данные отображаются мгновенно.
-- В карточке кота, если изображение не подгрузилось, показываем fallback-иллюстрацию и кнопку «Повторить».
-
-## Локальные ресурсы
-- Кастомная иконка приложения (`assets/icon/app_icon.png`) генерируется через `flutter_launcher_icons`.
-- Шрифты (`assets/fonts/Sora-*.ttf`).
-- Скриншоты для README хранятся в `assets/screenshots/` и используются и в документации, и в сторибордах.
-
-## Тестирование
-- Юнит-тест `cat_repository_test.dart` – проверяет парсинг и обработку ошибок при работе с API (используя `dio` interceptors + `http_mock_adapter`).
-- Виджет-тест для `SwipePage` – убедиться, что при mock-данных отрисовывается карточка и счётчик увеличивается после свайпа вправо.
+- `CatCard` – карточка с изображением (`CachedNetworkImage`), названием породы и индикаторами свайпа
+- `SwipeActions` – две круглые кнопки с тенями
+- `BreedsListTile` – факты о породе
