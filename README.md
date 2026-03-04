@@ -1,5 +1,5 @@
 # Cat Tinder
-
+https://github.com/ProgrammerPeasant/cat_tinder/actions/runs/22686535390/artifacts/5766981165 ссылка на апк)))
 Приложение для любителей котиков, построенное с использованием современных подходов разработки на Flutter, Clean Architecture и CI/CD.
 
 ## Фичи и Улучшения
