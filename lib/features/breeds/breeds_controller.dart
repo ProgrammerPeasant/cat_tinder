@@ -20,7 +20,7 @@ class BreedsController extends ChangeNotifier {
     notifyListeners();
     try {
       breeds = await _repository.getBreeds(forceRefresh: force);
-      state = LoadState.idle;
+      state = LoadState.initial;
     } on AppException catch (error) {
       lastError = error;
       state = LoadState.error;

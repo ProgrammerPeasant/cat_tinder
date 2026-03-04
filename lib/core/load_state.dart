@@ -1,1 +1,1 @@
-enum LoadState { idle, loading, error }
+enum LoadState { initial, loading, success, error }

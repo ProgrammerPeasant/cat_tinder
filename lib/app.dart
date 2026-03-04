@@ -1,38 +1,132 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/network/dio_client.dart';
 import 'core/ui/app_theme.dart';
+import 'core/services/local_auth_service.dart';
+import 'core/services/secure_storage_service.dart';
+import 'core/services/onboarding_service.dart';
+import 'core/services/analytics_service.dart';
 import 'data/repositories/cat_repository.dart';
 import 'data/services/cat_api_client.dart';
+import 'features/auth/auth_controller.dart';
+import 'features/auth/login_page.dart';
 import 'features/breeds/breeds_controller.dart';
 import 'features/breeds/breeds_page.dart';
 import 'features/swipe/swipe_controller.dart';
 import 'features/swipe/swipe_page.dart';
+import 'features/onboarding/onboarding_controller.dart';
+import 'features/onboarding/onboarding_page.dart' as onboarding;
 
 class CatTinderApp extends StatelessWidget {
   const CatTinderApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider(create: (_) => CatRepository(CatApiClient(createDioClient()))),
-        ChangeNotifierProvider(
-          create: (context) =>
-              SwipeController(context.read<CatRepository>())..init(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) =>
-              BreedsController(context.read<CatRepository>())..loadBreeds(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Cat Tinder',
-        theme: buildCatTinderTheme(),
-        home: const _HomeShell(),
-      ),
+    return FutureBuilder<SharedPreferences>(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return MaterialApp(
+            home: Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          );
+        }
+
+        final prefs = snapshot.data!;
+        final secureStorage = SecureStorageServiceImpl();
+        final authService = LocalAuthService(
+          prefs: prefs,
+          secureStorage: secureStorage,
+        );
+        final onboardingService = OnboardingServiceImpl(prefs: prefs);
+        
+        // Use local analytics service for now
+        // Can be replaced with Firebase analytics by creating a FirebaseAnalyticsService
+        final analyticsService = LocalAnalyticsService();
+
+        return MultiProvider(
+          providers: [
+            Provider<LocalAuthService>(create: (_) => authService),
+            Provider<OnboardingService>(create: (_) => onboardingService),
+            Provider<AnalyticsService>(create: (_) => analyticsService),
+            ChangeNotifierProvider(
+              create: (_) => AuthController(
+                authService,
+                analyticsService: analyticsService,
+              ),
+            ),
+            ChangeNotifierProvider(
+              create: (_) => OnboardingController(onboardingService),
+            ),
+            Provider(create: (_) => CatRepository(CatApiClient(createDioClient()))),
+            ChangeNotifierProvider(
+              create: (context) =>
+                  SwipeController(context.read<CatRepository>())..init(),
+            ),
+            ChangeNotifierProvider(
+              create: (context) =>
+                  BreedsController(context.read<CatRepository>())..loadBreeds(),
+            ),
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Cat Tinder',
+            theme: buildCatTinderTheme(),
+            home: const AppRouter(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class AppRouter extends StatefulWidget {
+  const AppRouter({super.key});
+
+  @override
+  State<AppRouter> createState() => _AppRouterState();
+}
+
+class _AppRouterState extends State<AppRouter> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AuthController>().checkAuthStatus();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer2<AuthController, OnboardingController>(
+      builder: (context, authController, onboardingController, _) {
+        // Show loading screen while components initialize
+        if (!onboardingController.isInitialized) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        // Check if user is authenticated
+        if (!authController.isAuthenticated) {
+          return const LoginPage();
+        }
+
+        // User is authenticated, check onboarding status
+        if (!onboardingController.hasCompletedOnboarding) {
+          return onboarding.OnboardingPageView();
+        }
+
+        // User is authenticated and onboarding is complete
+        return const _HomeShell();
+      },
     );
   }
 }

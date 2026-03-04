@@ -52,7 +52,7 @@ class SwipeController extends ChangeNotifier {
     await _ensureBufferFilled();
     if (_buffer.isNotEmpty) {
       currentCat = _buffer.removeFirst();
-      state = LoadState.idle;
+      state = LoadState.initial;
       notifyListeners();
       unawaited(_ensureBufferFilled());
     } else if (lastError != null) {
@@ -69,7 +69,7 @@ class SwipeController extends ChangeNotifier {
     }
     if (_buffer.isNotEmpty) {
       currentCat = _buffer.removeFirst();
-      state = LoadState.idle;
+      state = LoadState.initial;
       notifyListeners();
       unawaited(_ensureBufferFilled());
     } else if (lastError != null) {

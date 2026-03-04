@@ -40,8 +40,21 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_dotenv: ^5.1.0
 
+  # Authentication & Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.2
+  firebase_core: ^3.9.0
+  firebase_auth: ^5.3.0
+  firebase_analytics: ^11.4.0
+
+  # UI & Navigation
+  smooth_page_indicator: ^1.2.0
+
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -53,6 +66,8 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   mocktail: ^1.0.3
   http_mock_adapter: ^0.6.1
+  build_runner: ^2.4.12
+  very_good_analysis: ^10.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -68,7 +83,6 @@ flutter:
   assets:
     - assets/fonts/
     - assets/icon/
-    - assets/images/
     - assets/screenshots/
 
   fonts:

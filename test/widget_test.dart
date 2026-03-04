@@ -51,7 +51,7 @@ void main() {
 
       expect(controller.likes, 1);
       expect(controller.currentCat?.id, isNot(firstId));
-      expect(controller.state, LoadState.idle);
+      expect(controller.state, LoadState.initial);
     });
   });
 }
