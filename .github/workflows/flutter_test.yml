@@ -24,6 +24,15 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
       
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: cat_tinder_release
+          path: build/app/outputs/apk/release/
+      
       - name: Analyze
         run: flutter analyze
       
@@ -80,11 +89,3 @@ jobs:
         run: |
           echo "CAT_API_KEY=${{ secrets.CAT_API_KEY }}" > .env
       
-      - name: Build APK
-        run: flutter build apk --release
-      
-      - name: Upload APK to artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: cat_tinder_release
-          path: build/app/outputs/apk/release/
